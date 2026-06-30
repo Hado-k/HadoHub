@@ -6,7 +6,7 @@ local UserInputService = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
-local ICON_URL =
+local PFP_URL =     "https://raw.githubusercontent.com/Hado-k/HadoHub/main/hadopfpNew.png"  local BACKGROUND_URL =     "https://raw.githubusercontent.com/Hado-k/HadoHub/main/image.png"  local DISCORD_URL = "https://discord.gg/g9e6VZnhft"  local function LoadAsset(url, filename)     if not writefile or not isfile or not getcustomasset then         return nil     end      if not isfile(filename) then         local success, data = pcall(function()             return game:HttpGet(url, true)         end)          if success then             writefile(filename, data)         end     end      local success, asset = pcall(function()         return getcustomasset(filename)     end)      return success and asset or nil end  local HadoIcon = LoadAsset(PFP_URL, "HadoHubIcon.png") local HadoBackground =     LoadAsset(BACKGROUND_URL, "HadoHubBackground.png") =
     "https://raw.githubusercontent.com/Hado-k/HadoHub/main/hadopfpNew.png"
 
 local DISCORD_URL = "https://discord.gg/g9e6VZnhft"
@@ -72,24 +72,12 @@ BackgroundGradient.Color = ColorSequence.new({
 BackgroundGradient.Rotation = 35
 BackgroundGradient.Parent = Background
 
-local Glow = Instance.new("Frame")
-Glow.AnchorPoint = Vector2.new(0.5, 0.5)
-Glow.Position = UDim2.fromScale(0.5, 0.43)
-Glow.Size = UDim2.fromOffset(260, 260)
-Glow.BackgroundColor3 = PURPLE
-Glow.BackgroundTransparency = 0.82
-Glow.BorderSizePixel = 0
-Glow.Parent = Background
-
-local GlowCorner = Instance.new("UICorner")
-GlowCorner.CornerRadius = UDim.new(1, 0)
-GlowCorner.Parent = Glow
 
 local LogoFrame = Instance.new("Frame")
 LogoFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 LogoFrame.Position = UDim2.fromScale(0.5, 0.42)
 LogoFrame.Size = UDim2.fromOffset(20, 20)
-LogoFrame.BackgroundColor3 = Color3.fromRGB(15, 5, 28)
+LogoFrame.BackgroundTransparency = 1
 LogoFrame.BorderSizePixel = 0
 LogoFrame.ClipsDescendants = true
 LogoFrame.Parent = Background
@@ -98,14 +86,9 @@ local LogoCorner = Instance.new("UICorner")
 LogoCorner.CornerRadius = UDim.new(0, 30)
 LogoCorner.Parent = LogoFrame
 
-local LogoStroke = Instance.new("UIStroke")
-LogoStroke.Color = PURPLE
-LogoStroke.Thickness = 3
-LogoStroke.Parent = LogoFrame
-
 local LogoImage = Instance.new("ImageLabel")
-LogoImage.Position = UDim2.fromOffset(6, 6)
-LogoImage.Size = UDim2.new(1, -12, 1, -12)
+LogoImage.Position = UDim2.fromOffset(0, 0)
+LogoImage.Size = UDim2.fromScale(1, 1)
 LogoImage.BackgroundTransparency = 1
 LogoImage.Image = HadoIcon or ""
 LogoImage.ImageTransparency = 1
@@ -255,7 +238,12 @@ local Tabs = {
         Title = "Dashboard",
         Icon = "home"
     }),
-
+    
+     Main = Window:AddTab({
+        Title = "Main",
+        Icon = "layers"
+    }),
+    
     Player = Window:AddTab({
         Title = "Player",
         Icon = "user"
@@ -277,21 +265,28 @@ Tabs.Dashboard:AddParagraph({
     Content = "Professional purple experience by Hado-k.\nStatus: Online • Stable • Ready"
 })
 
-Tabs.Dashboard:AddButton({
-    Title = "Join the HadoHub Discord",
-    Description = "discord.gg/g9e6VZnhft",
-
-    Callback = function()
-        if setclipboard then
-            setclipboard(DISCORD_URL)
-        end
+local function OpenDiscord()
+    if openurl then
+        openurl(DISCORD_URL)
+    elseif open_url then
+        open_url(DISCORD_URL)
+    elseif syn and syn.open_url then
+        syn.open_url(DISCORD_URL)
+    elseif setclipboard then
+        setclipboard(DISCORD_URL)
 
         HadoHub:Notify({
             Title = "HadoHub",
-            Content = "Discord invitation copied.",
-            Duration = 3
+            Content = "Discord link copied.",
+            Duration = 4
         })
     end
+end
+
+Tabs.Dashboard:AddButton({
+    Title = "Join the HadoHub Discord",
+    Description = "discord.gg/g9e6VZnhft",
+    Callback = OpenDiscord
 })
 
 --// PLAYER CONTROLS
