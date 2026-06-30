@@ -297,7 +297,7 @@ task.spawn(function()
                         backgroundImage.Size = UDim2.fromScale(1, 1)
                         backgroundImage.BackgroundTransparency = 1
                         backgroundImage.Image = HadoBackground
-                        backgroundImage.ImageTransparency = 0.12
+                        backgroundImage.ImageTransparency = 0.04
                         backgroundImage.ScaleType = Enum.ScaleType.Crop
                         backgroundImage.ZIndex = 0
                         backgroundImage.Parent = windowFrame
@@ -347,7 +347,7 @@ task.spawn(function()
                             and styled.AbsoluteSize.X >= windowFrame.AbsoluteSize.X * 0.7
                             and styled.AbsoluteSize.Y >= windowFrame.AbsoluteSize.Y * 0.7
                             and styled.BackgroundTransparency < 0.45 then
-                            styled.BackgroundTransparency = 0.76
+                            styled.BackgroundTransparency = 0.84
                         end
                     end
 
@@ -606,22 +606,40 @@ Tabs.Player:AddSlider("FlySpeed", {
     end
 })
 
---// SPIN FLING
+--// FLING CONTROLS
 
-local SpinFlingEnabled = false
 local SpinFlingForce = nil
+local SpinFlingStabilizer = nil
+local SpinFlingConnection = nil
+local SavedRootProperties = nil
 
 local function StopSpinFling()
-    SpinFlingEnabled = false
+    if SpinFlingConnection then
+        SpinFlingConnection:Disconnect()
+        SpinFlingConnection = nil
+    end
 
     if SpinFlingForce then
         SpinFlingForce:Destroy()
         SpinFlingForce = nil
     end
 
+    if SpinFlingStabilizer then
+        SpinFlingStabilizer:Destroy()
+        SpinFlingStabilizer = nil
+    end
+
     local character = Player.Character
+    local root = character
+        and character:FindFirstChild("HumanoidRootPart")
     local humanoid = character
         and character:FindFirstChildOfClass("Humanoid")
+
+    if root then
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+        root.CustomPhysicalProperties = SavedRootProperties
+    end
 
     if humanoid then
         humanoid.AutoRotate = true
@@ -641,21 +659,43 @@ local function StartSpinFling()
         return
     end
 
-    SpinFlingEnabled = true
+    SavedRootProperties = root.CustomPhysicalProperties
+    root.CustomPhysicalProperties =
+        PhysicalProperties.new(100, 0, 0, 100, 100)
     humanoid.AutoRotate = false
 
     SpinFlingForce = Instance.new("BodyAngularVelocity")
     SpinFlingForce.Name = "HadoSpinFling"
-    SpinFlingForce.AngularVelocity = Vector3.new(0, 50000, 0)
+    SpinFlingForce.AngularVelocity = Vector3.new(0, 8500, 0)
     SpinFlingForce.MaxTorque =
         Vector3.new(math.huge, math.huge, math.huge)
     SpinFlingForce.P = math.huge
     SpinFlingForce.Parent = root
+
+    SpinFlingStabilizer = Instance.new("BodyVelocity")
+    SpinFlingStabilizer.Name = "HadoSpinStabilizer"
+    SpinFlingStabilizer.MaxForce =
+        Vector3.new(math.huge, 0, math.huge)
+    SpinFlingStabilizer.P = 25000
+    SpinFlingStabilizer.Parent = root
+
+    SpinFlingConnection = RunService.Heartbeat:Connect(function()
+        if not root.Parent or not humanoid.Parent then
+            StopSpinFling()
+            return
+        end
+
+        local speed = math.max(humanoid.WalkSpeed, 16)
+        SpinFlingStabilizer.Velocity =
+            humanoid.MoveDirection * speed
+        root.AssemblyAngularVelocity =
+            Vector3.new(0, 8500, 0)
+    end)
 end
 
 local SpinFlingToggle = Tabs.Player:AddToggle("SpinFling", {
-    Title = "Spin Fling",
-    Description = "Move normally while spinning; touch players to fling.",
+    Title = "Stable Spin Fling",
+    Description = "Move while spinning; horizontal movement is stabilized.",
     Default = false
 })
 
@@ -666,6 +706,101 @@ SpinFlingToggle:OnChanged(function(value)
         StopSpinFling()
     end
 end)
+
+local SelectedFlingPlayer = nil
+
+local function GetFlingPlayerNames()
+    local names = {}
+
+    for _, target in ipairs(Players:GetPlayers()) do
+        if target ~= Player then
+            table.insert(names, target.Name)
+        end
+    end
+
+    table.sort(names)
+
+    if #names == 0 then
+        table.insert(names, "No players available")
+    end
+
+    return names
+end
+
+local FlingDropdown = Tabs.Player:AddDropdown("FlingTarget", {
+    Title = "Fling target",
+    Description = "Choose one player to fling.",
+    Values = GetFlingPlayerNames(),
+    Multi = false,
+    Default = 1
+})
+
+FlingDropdown:OnChanged(function(value)
+    if value ~= "No players available" then
+        SelectedFlingPlayer = value
+    end
+end)
+
+Tabs.Player:AddButton({
+    Title = "Fling selected player",
+    Description = "Fling only the selected target.",
+
+    Callback = function()
+        local target = SelectedFlingPlayer
+            and Players:FindFirstChild(SelectedFlingPlayer)
+        local character = Player.Character
+        local targetCharacter = target and target.Character
+        local root = character
+            and character:FindFirstChild("HumanoidRootPart")
+        local targetRoot = targetCharacter
+            and targetCharacter:FindFirstChild("HumanoidRootPart")
+        local humanoid = character
+            and character:FindFirstChildOfClass("Humanoid")
+
+        if not root or not targetRoot or not humanoid then
+            HadoHub:Notify({
+                Title = "HadoHub",
+                Content = "Select a valid player first.",
+                Duration = 3
+            })
+            return
+        end
+
+        StopSpinFling()
+
+        local savedCFrame = root.CFrame
+        local angular = Instance.new("BodyAngularVelocity")
+        angular.AngularVelocity = Vector3.new(0, 99999, 0)
+        angular.MaxTorque =
+            Vector3.new(math.huge, math.huge, math.huge)
+        angular.P = math.huge
+        angular.Parent = root
+
+        local finishAt = os.clock() + 1.4
+
+        while os.clock() < finishAt
+            and root.Parent
+            and targetRoot.Parent do
+
+            root.CFrame = targetRoot.CFrame
+                * CFrame.new(
+                    math.random(-2, 2),
+                    math.random(-1, 2),
+                    math.random(-2, 2)
+                )
+
+            root.AssemblyAngularVelocity =
+                Vector3.new(0, 99999, 0)
+
+            RunService.Heartbeat:Wait()
+        end
+
+        angular:Destroy()
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+        root.CFrame = savedCFrame
+    end
+})
 
 --// ESP
 
