@@ -282,8 +282,8 @@ task.spawn(function()
                 if windowFrame then
                     local icon = Instance.new("ImageLabel")
                     icon.Name = "HadoTitleIcon"
-                    icon.Position = UDim2.fromOffset(13, 13)
-                    icon.Size = UDim2.fromOffset(22, 22)
+                    icon.Position = UDim2.fromOffset(11, 7)
+                    icon.Size = UDim2.fromOffset(30, 30)
                     icon.BackgroundTransparency = 1
                     icon.Image = HadoIcon
                     icon.ScaleType = Enum.ScaleType.Crop
@@ -293,6 +293,42 @@ task.spawn(function()
                     local iconCorner = Instance.new("UICorner")
                     iconCorner.CornerRadius = UDim.new(0, 6)
                     iconCorner.Parent = icon
+
+                    if HadoBackground
+                        and not windowFrame:FindFirstChild("HadoWindowBackground") then
+
+                        local backgroundImage = Instance.new("ImageLabel")
+                        backgroundImage.Name = "HadoWindowBackground"
+                        backgroundImage.Size = UDim2.fromScale(1, 1)
+                        backgroundImage.BackgroundTransparency = 1
+                        backgroundImage.Image = HadoBackground
+                        backgroundImage.ImageTransparency = 0.68
+                        backgroundImage.ScaleType = Enum.ScaleType.Crop
+                        backgroundImage.ZIndex = 0
+                        backgroundImage.Parent = windowFrame
+
+                        local backgroundCorner = Instance.new("UICorner")
+                        backgroundCorner.CornerRadius = UDim.new(0, 8)
+                        backgroundCorner.Parent = backgroundImage
+                    end
+
+                    for _, styled in ipairs(windowFrame:GetDescendants()) do
+                        if styled:IsA("TextLabel")
+                            or styled:IsA("TextButton") then
+
+                            if string.find(styled.Text, "HADO HUB", 1, true) then
+                                styled.TextColor3 = Color3.fromRGB(202, 112, 255)
+                            else
+                                styled.TextColor3 = Color3.fromRGB(232, 207, 255)
+                            end
+                        elseif styled:IsA("UIStroke") then
+                            styled.Color = Color3.fromRGB(166, 72, 255)
+                        elseif styled:IsA("Frame")
+                            and styled ~= windowFrame
+                            and styled.BackgroundTransparency < 0.18 then
+                            styled.BackgroundTransparency = 0.26
+                        end
+                    end
 
                     return
                 end
