@@ -297,7 +297,7 @@ task.spawn(function()
                         backgroundImage.Size = UDim2.fromScale(1, 1)
                         backgroundImage.BackgroundTransparency = 1
                         backgroundImage.Image = HadoBackground
-                        backgroundImage.ImageTransparency = 0.48
+                        backgroundImage.ImageTransparency = 0.20
                         backgroundImage.ScaleType = Enum.ScaleType.Crop
                         backgroundImage.ZIndex = 1
                         backgroundImage.Parent = windowFrame
@@ -306,8 +306,14 @@ task.spawn(function()
                         backgroundCorner.CornerRadius = UDim.new(0, 8)
                         backgroundCorner.Parent = backgroundImage
                     end
-                    element.TextSize = math.max(element.TextSize, 14)
-                    element.TextColor3 = Color3.fromRGB(214, 88, 255)
+                    local titlePadding = element:FindFirstChild("HadoTitlePadding")
+                        or Instance.new("UIPadding")
+                    titlePadding.Name = "HadoTitlePadding"
+                    titlePadding.PaddingLeft = UDim.new(0, 44)
+                    titlePadding.Parent = element
+
+                    element.TextSize = math.max(element.TextSize, 15)
+                    element.TextColor3 = Color3.fromRGB(225, 83, 255)
 
                     local titleGlow = element:FindFirstChild("HadoNeonGlow")
                         or Instance.new("UIStroke")
@@ -338,7 +344,7 @@ task.spawn(function()
                             and styled.AbsoluteSize.X >= windowFrame.AbsoluteSize.X * 0.7
                             and styled.AbsoluteSize.Y >= windowFrame.AbsoluteSize.Y * 0.7
                             and styled.BackgroundTransparency < 0.45 then
-                            styled.BackgroundTransparency = 0.42
+                            styled.BackgroundTransparency = 0.68
                         end
                     end
 
