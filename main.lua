@@ -230,6 +230,65 @@ local Window = HadoHub:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
+-- Add the Hado PFP to Fluent's title bar
+task.spawn(function()
+    task.wait(0.8)
+
+    if not HadoIcon then
+        return
+    end
+
+    local roots = { PlayerGui }
+
+    pcall(function()
+        table.insert(roots, game:GetService("CoreGui"))
+    end)
+
+    pcall(function()
+        if gethui then
+            table.insert(roots, gethui())
+        end
+    end)
+
+    for _, rootGui in ipairs(roots) do
+        for _, element in ipairs(rootGui:GetDescendants()) do
+            if element:IsA("TextLabel")
+                and string.find(element.Text, "HADO HUB", 1, true)
+                and not element.Parent:FindFirstChild("HadoTitleIcon") then
+
+                local icon = Instance.new("ImageLabel")
+                icon.Name = "HadoTitleIcon"
+                icon.AnchorPoint = Vector2.new(0, 0.5)
+                icon.Position = UDim2.new(
+                    element.Position.X.Scale,
+                    element.Position.X.Offset,
+                    0.5,
+                    0
+                )
+                icon.Size = UDim2.fromOffset(24, 24)
+                icon.BackgroundTransparency = 1
+                icon.Image = HadoIcon
+                icon.ScaleType = Enum.ScaleType.Crop
+                icon.ZIndex = element.ZIndex + 1
+                icon.Parent = element.Parent
+
+                local iconCorner = Instance.new("UICorner")
+                iconCorner.CornerRadius = UDim.new(0, 6)
+                iconCorner.Parent = icon
+
+                element.Position = UDim2.new(
+                    element.Position.X.Scale,
+                    element.Position.X.Offset + 31,
+                    element.Position.Y.Scale,
+                    element.Position.Y.Offset
+                )
+
+                return
+            end
+        end
+    end
+end)
+
 local Tabs = {
     Dashboard = Window:AddTab({
         Title = "Dashboard",
