@@ -276,8 +276,8 @@ task.spawn(function()
                     if HadoIcon then
                         local icon = Instance.new("ImageLabel")
                         icon.Name = "HadoTitleIcon"
-                        icon.Position = UDim2.fromOffset(11, 7)
-                        icon.Size = UDim2.fromOffset(30, 30)
+                        icon.Position = UDim2.fromOffset(8, 4)
+                        icon.Size = UDim2.fromOffset(36, 36)
                         icon.BackgroundTransparency = 1
                         icon.Image = HadoIcon
                         icon.ScaleType = Enum.ScaleType.Crop
@@ -309,10 +309,11 @@ task.spawn(function()
                     local titlePadding = element:FindFirstChild("HadoTitlePadding")
                         or Instance.new("UIPadding")
                     titlePadding.Name = "HadoTitlePadding"
-                    titlePadding.PaddingLeft = UDim.new(0, 44)
+                    titlePadding.PaddingLeft = UDim.new(0, 50)
                     titlePadding.Parent = element
 
-                    element.TextSize = math.max(element.TextSize, 20)
+                    element.TextSize = math.max(element.TextSize, 21)
+                    element.Font = Enum.Font.GothamBold
                     element.TextColor3 = Color3.fromRGB(225, 83, 255)
 
                     local titleGlow = element:FindFirstChild("HadoNeonGlow")
@@ -325,7 +326,14 @@ task.spawn(function()
 
                     for _, styled in ipairs(windowFrame:GetDescendants()) do
                         if styled:IsA("TextLabel")
-                            or styled:IsA("TextButton") then
+                            or styled:IsA("TextButton")
+                            or styled:IsA("TextBox") then
+
+                            if styled.TextSize >= 18 then
+                                styled.Font = Enum.Font.GothamBold
+                            else
+                                styled.Font = Enum.Font.GothamMedium
+                            end
 
                             if string.find(styled.Text, "HADO HUB", 1, true) then
                                 styled.TextColor3 = Color3.fromRGB(202, 112, 255)
@@ -598,111 +606,66 @@ Tabs.Player:AddSlider("FlySpeed", {
     end
 })
 
---// FLING
+--// SPIN FLING
 
-local SelectedFlingPlayer = nil
+local SpinFlingEnabled = false
+local SpinFlingForce = nil
 
-local function GetFlingPlayerNames()
-    local names = {}
+local function StopSpinFling()
+    SpinFlingEnabled = false
 
-    for _, target in ipairs(Players:GetPlayers()) do
-        if target ~= Player then
-            table.insert(names, target.Name)
-        end
+    if SpinFlingForce then
+        SpinFlingForce:Destroy()
+        SpinFlingForce = nil
     end
 
-    table.sort(names)
+    local character = Player.Character
+    local humanoid = character
+        and character:FindFirstChildOfClass("Humanoid")
 
-    if #names == 0 then
-        table.insert(names, "No players available")
+    if humanoid then
+        humanoid.AutoRotate = true
     end
-
-    return names
 end
 
-local FlingDropdown = Tabs.Player:AddDropdown("FlingTarget", {
-    Title = "Fling target",
-    Description = "Choose the player you want to fling.",
-    Values = GetFlingPlayerNames(),
-    Multi = false,
-    Default = 1
+local function StartSpinFling()
+    StopSpinFling()
+
+    local character = Player.Character
+    local root = character
+        and character:FindFirstChild("HumanoidRootPart")
+    local humanoid = character
+        and character:FindFirstChildOfClass("Humanoid")
+
+    if not root or not humanoid then
+        return
+    end
+
+    SpinFlingEnabled = true
+    humanoid.AutoRotate = false
+
+    SpinFlingForce = Instance.new("BodyAngularVelocity")
+    SpinFlingForce.Name = "HadoSpinFling"
+    SpinFlingForce.AngularVelocity = Vector3.new(0, 50000, 0)
+    SpinFlingForce.MaxTorque =
+        Vector3.new(math.huge, math.huge, math.huge)
+    SpinFlingForce.P = math.huge
+    SpinFlingForce.Parent = root
+end
+
+local SpinFlingToggle = Tabs.Player:AddToggle("SpinFling", {
+    Title = "Spin Fling",
+    Description = "Move normally while spinning; touch players to fling.",
+    Default = false
 })
 
-FlingDropdown:OnChanged(function(value)
-    if value ~= "No players available" then
-        SelectedFlingPlayer = value
+SpinFlingToggle:OnChanged(function(value)
+    if value then
+        StartSpinFling()
+    else
+        StopSpinFling()
     end
 end)
-
-Tabs.Player:AddButton({
-    Title = "Spin fling selected player",
-    Description = "Spin-fling the selected player.",
-
-    Callback = function()
-        local target = SelectedFlingPlayer
-            and Players:FindFirstChild(SelectedFlingPlayer)
-
-        local character = Player.Character
-        local targetCharacter = target and target.Character
-        local root = character
-            and character:FindFirstChild("HumanoidRootPart")
-        local targetRoot = targetCharacter
-            and targetCharacter:FindFirstChild("HumanoidRootPart")
-        local humanoid = character
-            and character:FindFirstChildOfClass("Humanoid")
-
-        if not target or not root or not targetRoot or not humanoid then
-            HadoHub:Notify({
-                Title = "HadoHub",
-                Content = "Select a valid player first.",
-                Duration = 3
-            })
-            return
-        end
-
-        local savedCFrame = root.CFrame
-        local angular = Instance.new("BodyAngularVelocity")
-        angular.Name = "HadoFlingForce"
-        angular.AngularVelocity = Vector3.new(0, 99999, 0)
-        angular.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-        angular.P = math.huge
-        angular.Parent = root
-
-        humanoid.PlatformStand = true
-
-        local finishAt = os.clock() + 1.6
-
-        while os.clock() < finishAt
-            and targetRoot.Parent
-            and root.Parent do
-
-            root.CFrame = targetRoot.CFrame
-                * CFrame.new(
-                    math.random(-2, 2),
-                    math.random(-1, 2),
-                    math.random(-2, 2)
-                )
-
-            root.AssemblyLinearVelocity = Vector3.zero
-            root.AssemblyAngularVelocity =
-                Vector3.new(0, 100000, 0)
-
-            RunService.Heartbeat:Wait()
-        end
-
-        angular:Destroy()
-        humanoid.PlatformStand = false
-        root.AssemblyLinearVelocity = Vector3.zero
-        root.AssemblyAngularVelocity = Vector3.zero
-        root.CFrame = savedCFrame
-
-        HadoHub:Notify({
-            Title = "HadoHub",
-            Content = "Fling finished.",
-            Duration = 2
-        })
-    end
-})
 
 --// ESP
 
