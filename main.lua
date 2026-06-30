@@ -297,7 +297,7 @@ task.spawn(function()
                         backgroundImage.Size = UDim2.fromScale(1, 1)
                         backgroundImage.BackgroundTransparency = 1
                         backgroundImage.Image = HadoBackground
-                        backgroundImage.ImageTransparency = 0.20
+                        backgroundImage.ImageTransparency = 0.12
                         backgroundImage.ScaleType = Enum.ScaleType.Crop
                         backgroundImage.ZIndex = 1
                         backgroundImage.Parent = windowFrame
@@ -312,7 +312,7 @@ task.spawn(function()
                     titlePadding.PaddingLeft = UDim.new(0, 44)
                     titlePadding.Parent = element
 
-                    element.TextSize = math.max(element.TextSize, 15)
+                    element.TextSize = math.max(element.TextSize, 18)
                     element.TextColor3 = Color3.fromRGB(225, 83, 255)
 
                     local titleGlow = element:FindFirstChild("HadoNeonGlow")
@@ -344,10 +344,43 @@ task.spawn(function()
                             and styled.AbsoluteSize.X >= windowFrame.AbsoluteSize.X * 0.7
                             and styled.AbsoluteSize.Y >= windowFrame.AbsoluteSize.Y * 0.7
                             and styled.BackgroundTransparency < 0.45 then
-                            styled.BackgroundTransparency = 0.68
+                            styled.BackgroundTransparency = 0.76
                         end
                     end
 
+                    local function RaiseFluentDialogs()
+                        for _, candidate in ipairs(windowFrame:GetDescendants()) do
+                            if candidate:IsA("TextLabel")
+                                and candidate.Text == "Close" then
+
+                                local dialogRoot = candidate
+
+                                while dialogRoot.Parent
+                                    and dialogRoot.Parent ~= windowFrame do
+                                    dialogRoot = dialogRoot.Parent
+                                end
+
+                                if dialogRoot:IsA("GuiObject") then
+                                    dialogRoot.ZIndex = 500
+                                end
+
+                                for _, dialogPart in ipairs(dialogRoot:GetDescendants()) do
+                                    if dialogPart:IsA("GuiObject") then
+                                        dialogPart.ZIndex = math.max(
+                                            dialogPart.ZIndex,
+                                            501
+                                        )
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    windowFrame.DescendantAdded:Connect(function()
+                        task.defer(RaiseFluentDialogs)
+                    end)
+
+                    RaiseFluentDialogs()
                     return
                 end
             end
