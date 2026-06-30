@@ -269,8 +269,11 @@ task.spawn(function()
                 while current and current ~= rootGui do
                     if current:IsA("GuiObject")
                         and current.AbsoluteSize.X >= 580
-                        and current.AbsoluteSize.Y >= 400 then
+                        and current.AbsoluteSize.X <= 720
+                        and current.AbsoluteSize.Y >= 400
+                        and current.AbsoluteSize.Y <= 580 then
                         windowFrame = current
+                        break
                     end
 
                     current = current.Parent
