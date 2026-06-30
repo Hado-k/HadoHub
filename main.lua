@@ -1,5 +1,4 @@
-local HadoHub = loadstring(game:HttpGet(
-    "https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"
+local HadoHub = loadstring(game:HttpGet("https://raw.githubusercontent.com/Hado-k/HadoHub/main/main.lua"))()
 ))()
 
 local TweenService = game:GetService("TweenService")
