@@ -1,206 +1,161 @@
-local HadoHub = loadstring(game:HttpGet("https://raw.githubusercontent.com/Hado-k/HadoHub/main/main.lua"))()
-))()
-
+local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
 
---// HADO INTRO
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
+-- Remove previous interface
+local PreviousIntro = PlayerGui:FindFirstChild("HadoHubIntro")
+if PreviousIntro then
+    PreviousIntro:Destroy()
+end
+
+-- Intro
 local Intro = Instance.new("ScreenGui")
 Intro.Name = "HadoHubIntro"
 Intro.IgnoreGuiInset = true
 Intro.ResetOnSpawn = false
-Intro.DisplayOrder = 999999
-
-if gethui then
-    Intro.Parent = gethui()
-else
-    Intro.Parent = CoreGui
-end
+Intro.DisplayOrder = 999
+Intro.Parent = PlayerGui
 
 local Background = Instance.new("Frame")
 Background.Size = UDim2.fromScale(1, 1)
-Background.BackgroundColor3 = Color3.fromRGB(5, 2, 12)
+Background.BackgroundColor3 = Color3.fromRGB(7, 2, 15)
 Background.BorderSizePixel = 0
 Background.Parent = Intro
 
 local BackgroundGradient = Instance.new("UIGradient")
 BackgroundGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 2, 12)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(35, 7, 65)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 2, 30))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(7, 2, 15)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(61, 12, 105)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 3, 35))
 })
 BackgroundGradient.Rotation = 35
 BackgroundGradient.Parent = Background
 
-local Glow = Instance.new("Frame")
-Glow.AnchorPoint = Vector2.new(0.5, 0.5)
-Glow.Position = UDim2.fromScale(0.5, 0.5)
-Glow.Size = UDim2.fromOffset(300, 300)
-Glow.BackgroundColor3 = Color3.fromRGB(133, 36, 255)
-Glow.BackgroundTransparency = 0.75
-Glow.BorderSizePixel = 0
-Glow.Parent = Background
-
-local GlowCorner = Instance.new("UICorner")
-GlowCorner.CornerRadius = UDim.new(1, 0)
-GlowCorner.Parent = Glow
-
-local GlowGradient = Instance.new("UIGradient")
-GlowGradient.Transparency = NumberSequence.new({
-    NumberSequenceKeypoint.new(0, 0.3),
-    NumberSequenceKeypoint.new(1, 1)
-})
-GlowGradient.Parent = Glow
-
-local LogoContainer = Instance.new("Frame")
-LogoContainer.AnchorPoint = Vector2.new(0.5, 0.5)
-LogoContainer.Position = UDim2.fromScale(0.5, 0.46)
-LogoContainer.Size = UDim2.fromOffset(150, 150)
-LogoContainer.BackgroundColor3 = Color3.fromRGB(17, 8, 31)
-LogoContainer.BackgroundTransparency = 1
-LogoContainer.Parent = Background
+local LogoFrame = Instance.new("Frame")
+LogoFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+LogoFrame.Position = UDim2.fromScale(0.5, 0.42)
+LogoFrame.Size = UDim2.fromOffset(20, 20)
+LogoFrame.BackgroundColor3 = Color3.fromRGB(28, 10, 50)
+LogoFrame.BorderSizePixel = 0
+LogoFrame.Parent = Background
 
 local LogoCorner = Instance.new("UICorner")
-LogoCorner.CornerRadius = UDim.new(0, 35)
-LogoCorner.Parent = LogoContainer
+LogoCorner.CornerRadius = UDim.new(0, 30)
+LogoCorner.Parent = LogoFrame
 
 local LogoStroke = Instance.new("UIStroke")
-LogoStroke.Color = Color3.fromRGB(170, 75, 255)
+LogoStroke.Color = Color3.fromRGB(189, 84, 255)
 LogoStroke.Thickness = 3
-LogoStroke.Transparency = 1
-LogoStroke.Parent = LogoContainer
+LogoStroke.Parent = LogoFrame
 
 local LogoGradient = Instance.new("UIGradient")
 LogoGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(78, 18, 140)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(24, 7, 44))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(111, 27, 208)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 8, 51))
 })
 LogoGradient.Rotation = 45
-LogoGradient.Parent = LogoContainer
+LogoGradient.Parent = LogoFrame
 
 local Logo = Instance.new("TextLabel")
 Logo.Size = UDim2.fromScale(1, 1)
 Logo.BackgroundTransparency = 1
 Logo.Text = "H"
-Logo.TextColor3 = Color3.fromRGB(217, 156, 255)
+Logo.TextColor3 = Color3.fromRGB(235, 190, 255)
 Logo.TextTransparency = 1
+Logo.Font = Enum.Font.GothamBold
 Logo.TextScaled = true
-Logo.Font = Enum.Font.GothamBlack
-Logo.Parent = LogoContainer
+Logo.Parent = LogoFrame
 
 local LogoPadding = Instance.new("UIPadding")
-LogoPadding.PaddingTop = UDim.new(0, 20)
-LogoPadding.PaddingBottom = UDim.new(0, 20)
-LogoPadding.PaddingLeft = UDim.new(0, 20)
-LogoPadding.PaddingRight = UDim.new(0, 20)
+LogoPadding.PaddingTop = UDim.new(0, 24)
+LogoPadding.PaddingBottom = UDim.new(0, 24)
+LogoPadding.PaddingLeft = UDim.new(0, 24)
+LogoPadding.PaddingRight = UDim.new(0, 24)
 LogoPadding.Parent = Logo
 
 local Title = Instance.new("TextLabel")
-Title.AnchorPoint = Vector2.new(0.5, 0)
-Title.Position = UDim2.new(0.5, 0, 0.46, 100)
-Title.Size = UDim2.fromOffset(400, 55)
+Title.AnchorPoint = Vector2.new(0.5, 0.5)
+Title.Position = UDim2.fromScale(0.5, 0.59)
+Title.Size = UDim2.fromOffset(450, 50)
 Title.BackgroundTransparency = 1
 Title.Text = "HADO HUB"
-Title.TextColor3 = Color3.fromRGB(245, 235, 255)
+Title.TextColor3 = Color3.fromRGB(250, 243, 255)
 Title.TextTransparency = 1
-Title.Font = Enum.Font.GothamBlack
-Title.TextSize = 31
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 32
 Title.Parent = Background
 
 local Subtitle = Instance.new("TextLabel")
-Subtitle.AnchorPoint = Vector2.new(0.5, 0)
-Subtitle.Position = UDim2.new(0.5, 0, 0.46, 150)
-Subtitle.Size = UDim2.fromOffset(400, 30)
+Subtitle.AnchorPoint = Vector2.new(0.5, 0.5)
+Subtitle.Position = UDim2.fromScale(0.5, 0.64)
+Subtitle.Size = UDim2.fromOffset(450, 30)
 Subtitle.BackgroundTransparency = 1
-Subtitle.Text = "POWER • PRECISION • STYLE"
-Subtitle.TextColor3 = Color3.fromRGB(172, 121, 214)
+Subtitle.Text = "PREMIUM EXPERIENCE  •  V1.0"
+Subtitle.TextColor3 = Color3.fromRGB(195, 130, 238)
 Subtitle.TextTransparency = 1
 Subtitle.Font = Enum.Font.GothamMedium
 Subtitle.TextSize = 12
 Subtitle.Parent = Background
 
-local LoadingBar = Instance.new("Frame")
-LoadingBar.AnchorPoint = Vector2.new(0.5, 0)
-LoadingBar.Position = UDim2.new(0.5, 0, 0.46, 205)
-LoadingBar.Size = UDim2.fromOffset(240, 4)
-LoadingBar.BackgroundColor3 = Color3.fromRGB(38, 22, 52)
-LoadingBar.BackgroundTransparency = 1
-LoadingBar.BorderSizePixel = 0
-LoadingBar.Parent = Background
+local Bar = Instance.new("Frame")
+Bar.AnchorPoint = Vector2.new(0.5, 0.5)
+Bar.Position = UDim2.fromScale(0.5, 0.7)
+Bar.Size = UDim2.fromOffset(240, 4)
+Bar.BackgroundColor3 = Color3.fromRGB(52, 29, 68)
+Bar.BorderSizePixel = 0
+Bar.Parent = Background
 
-local LoadingCorner = Instance.new("UICorner")
-LoadingCorner.CornerRadius = UDim.new(1, 0)
-LoadingCorner.Parent = LoadingBar
+local BarCorner = Instance.new("UICorner")
+BarCorner.CornerRadius = UDim.new(1, 0)
+BarCorner.Parent = Bar
 
-local LoadingFill = Instance.new("Frame")
-LoadingFill.Size = UDim2.fromScale(0, 1)
-LoadingFill.BackgroundColor3 = Color3.fromRGB(162, 61, 255)
-LoadingFill.BorderSizePixel = 0
-LoadingFill.Parent = LoadingBar
+local Fill = Instance.new("Frame")
+Fill.Size = UDim2.fromScale(0, 1)
+Fill.BackgroundColor3 = Color3.fromRGB(178, 67, 255)
+Fill.BorderSizePixel = 0
+Fill.Parent = Bar
 
 local FillCorner = Instance.new("UICorner")
 FillCorner.CornerRadius = UDim.new(1, 0)
-FillCorner.Parent = LoadingFill
-
-local FillGradient = Instance.new("UIGradient")
-FillGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(111, 29, 230)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(221, 111, 255))
-})
-FillGradient.Parent = LoadingFill
+FillCorner.Parent = Fill
 
 TweenService:Create(
-    Glow,
-    TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-    {Size = UDim2.fromOffset(550, 550), BackgroundTransparency = 0.9}
-):Play()
-
-TweenService:Create(
-    LogoContainer,
-    TweenInfo.new(0.65, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-    {BackgroundTransparency = 0}
-):Play()
-
-TweenService:Create(
-    LogoStroke,
-    TweenInfo.new(0.5),
-    {Transparency = 0.1}
+    LogoFrame,
+    TweenInfo.new(0.7, Enum.EasingStyle.Back),
+    {Size = UDim2.fromOffset(140, 140)}
 ):Play()
 
 TweenService:Create(
     Logo,
-    TweenInfo.new(0.55),
+    TweenInfo.new(0.6),
     {TextTransparency = 0}
 ):Play()
 
-task.wait(0.25)
+task.wait(0.35)
 
-TweenService:Create(Title, TweenInfo.new(0.45), {
+TweenService:Create(Title, TweenInfo.new(0.4), {
     TextTransparency = 0
 }):Play()
 
-TweenService:Create(Subtitle, TweenInfo.new(0.45), {
+TweenService:Create(Subtitle, TweenInfo.new(0.4), {
     TextTransparency = 0
-}):Play()
-
-TweenService:Create(LoadingBar, TweenInfo.new(0.35), {
-    BackgroundTransparency = 0
 }):Play()
 
 TweenService:Create(
-    LoadingFill,
-    TweenInfo.new(1.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+    Fill,
+    TweenInfo.new(1.5, Enum.EasingStyle.Quint),
     {Size = UDim2.fromScale(1, 1)}
 ):Play()
 
-task.wait(2)
+task.wait(1.8)
 
-TweenService:Create(Background, TweenInfo.new(0.5), {
+TweenService:Create(Background, TweenInfo.new(0.4), {
     BackgroundTransparency = 1
 }):Play()
 
-TweenService:Create(LogoContainer, TweenInfo.new(0.4), {
+TweenService:Create(LogoFrame, TweenInfo.new(0.35), {
     BackgroundTransparency = 1
 }):Play()
 
@@ -216,14 +171,17 @@ TweenService:Create(Subtitle, TweenInfo.new(0.3), {
     TextTransparency = 1
 }):Play()
 
-task.wait(0.55)
+task.wait(0.45)
 Intro:Destroy()
 
---// MAIN WINDOW
+-- Load Fluent after the intro
+local HadoHub = loadstring(game:HttpGet(
+    "https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"
+))()
 
 local Window = HadoHub:CreateWindow({
     Title = "HADO HUB",
-    SubTitle = "Premium Experience • v1.0",
+    SubTitle = "by Hado-k • v1.0",
     TabWidth = 155,
     Size = UDim2.fromOffset(640, 500),
     Acrylic = true,
@@ -234,7 +192,7 @@ local Window = HadoHub:CreateWindow({
 local Tabs = {
     Dashboard = Window:AddTab({
         Title = "Dashboard",
-        Icon = "layout-dashboard"
+        Icon = "home"
     }),
 
     Main = Window:AddTab({
@@ -260,16 +218,11 @@ local Tabs = {
 
 Tabs.Dashboard:AddParagraph({
     Title = "Welcome to HadoHub",
-    Content = "A polished and powerful experience designed by Hado-k.\nUse the navigation menu to explore all available features."
-})
-
-Tabs.Dashboard:AddParagraph({
-    Title = "Status",
-    Content = "● HadoHub is online\n● Interface loaded successfully\n● Version 1.0 • Stable"
+    Content = "Professional purple experience by Hado-k.\nVersion 1.0 • Online and ready."
 })
 
 Tabs.Dashboard:AddButton({
-    Title = "Copy Discord invite",
+    Title = "Copy Discord invitation",
     Description = "Join the official HadoHub community.",
 
     Callback = function()
@@ -285,31 +238,31 @@ Tabs.Dashboard:AddButton({
     end
 })
 
-local MasterToggle = Tabs.Main:AddToggle("MasterToggle", {
+local Master = Tabs.Main:AddToggle("MasterEnabled", {
     Title = "Enable HadoHub",
-    Description = "Master switch for all HadoHub features.",
+    Description = "Master switch for the main features.",
     Default = false
 })
 
-MasterToggle:OnChanged(function(value)
+Master:OnChanged(function(value)
     HadoHub:Notify({
         Title = "HadoHub",
-        Content = value and "Main features enabled." or "Main features disabled.",
+        Content = value and "Features enabled." or "Features disabled.",
         Duration = 2
     })
 end)
 
-Tabs.Main:AddDropdown("HadoMode", {
+Tabs.Main:AddDropdown("Mode", {
     Title = "Operating mode",
-    Description = "Choose your preferred configuration.",
+    Description = "Select your preferred configuration.",
     Values = {"Legit", "Balanced", "Performance"},
     Multi = false,
     Default = 2
 })
 
-Tabs.Main:AddSlider("PowerLevel", {
+Tabs.Main:AddSlider("Power", {
     Title = "Power level",
-    Description = "Control the intensity of enabled features.",
+    Description = "Adjust the feature intensity.",
     Default = 50,
     Min = 0,
     Max = 100,
@@ -318,53 +271,31 @@ Tabs.Main:AddSlider("PowerLevel", {
 
 Tabs.Player:AddSlider("WalkSpeed", {
     Title = "Walk speed",
-    Description = "Adjust your character movement speed.",
+    Description = "Adjust the character movement speed.",
     Default = 16,
     Min = 16,
     Max = 100,
     Rounding = 0,
 
     Callback = function(value)
-        local player = game:GetService("Players").LocalPlayer
-        local character = player.Character
-        local humanoid = character
-            and character:FindFirstChildOfClass("Humanoid")
+        local Character = Player.Character
+        local Humanoid = Character
+            and Character:FindFirstChildOfClass("Humanoid")
 
-        if humanoid then
-            humanoid.WalkSpeed = value
+        if Humanoid then
+            Humanoid.WalkSpeed = value
         end
     end
 })
 
-Tabs.Player:AddButton({
-    Title = "Reset character",
-    Description = "Respawn your character immediately.",
-
-    Callback = function()
-        local player = game:GetService("Players").LocalPlayer
-        local humanoid = player.Character
-            and player.Character:FindFirstChildOfClass("Humanoid")
-
-        if humanoid then
-            humanoid.Health = 0
-        end
-    end
-})
-
-Tabs.Visuals:AddToggle("PurpleVisuals", {
+Tabs.Visuals:AddToggle("PurpleMode", {
     Title = "Purple visual mode",
-    Description = "Enable the signature HadoHub visual style.",
+    Description = "Use the signature HadoHub appearance.",
     Default = true
 })
 
-Tabs.Visuals:AddColorpicker("AccentColor", {
-    Title = "Accent color",
-    Description = "Select your preferred interface accent.",
-    Default = Color3.fromRGB(161, 65, 255)
-})
-
 Tabs.Settings:AddKeybind("MenuKey", {
-    Title = "Interface key",
+    Title = "Menu key",
     Description = "Key used to minimize HadoHub.",
     Mode = "Toggle",
     Default = "LeftControl"
@@ -372,7 +303,7 @@ Tabs.Settings:AddKeybind("MenuKey", {
 
 Tabs.Settings:AddButton({
     Title = "Unload HadoHub",
-    Description = "Safely close the entire interface.",
+    Description = "Safely close the interface.",
 
     Callback = function()
         HadoHub:Destroy()
@@ -380,8 +311,8 @@ Tabs.Settings:AddButton({
 })
 
 HadoHub:Notify({
-    Title = "Welcome to HadoHub",
-    Content = "Professional purple interface loaded.",
+    Title = "HadoHub v1.0",
+    Content = "Interface loaded successfully.",
     SubContent = "Press Left Ctrl to minimize.",
     Duration = 5
 })
