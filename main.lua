@@ -314,7 +314,7 @@ task.spawn(function()
 
                     element.Position = UDim2.new(
                         element.Position.X.Scale,
-                        element.Position.X.Offset + 18,
+                        element.Position.X.Offset + 48,
                         element.Position.Y.Scale,
                         element.Position.Y.Offset
                     )
@@ -571,6 +571,111 @@ Tabs.Player:AddSlider("FlySpeed", {
 
     Callback = function(value)
         FlySpeed = value
+    end
+})
+
+--// FLING
+
+local SelectedFlingPlayer = nil
+
+local function GetFlingPlayerNames()
+    local names = {}
+
+    for _, target in ipairs(Players:GetPlayers()) do
+        if target ~= Player then
+            table.insert(names, target.Name)
+        end
+    end
+
+    table.sort(names)
+
+    if #names == 0 then
+        table.insert(names, "No players available")
+    end
+
+    return names
+end
+
+local FlingDropdown = Tabs.Player:AddDropdown("FlingTarget", {
+    Title = "Fling target",
+    Description = "Choose the player you want to fling.",
+    Values = GetFlingPlayerNames(),
+    Multi = false,
+    Default = 1
+})
+
+FlingDropdown:OnChanged(function(value)
+    if value ~= "No players available" then
+        SelectedFlingPlayer = value
+    end
+end)
+
+Tabs.Player:AddButton({
+    Title = "Fling selected player",
+    Description = "Fling the player selected above.",
+
+    Callback = function()
+        local target = SelectedFlingPlayer
+            and Players:FindFirstChild(SelectedFlingPlayer)
+
+        local character = Player.Character
+        local targetCharacter = target and target.Character
+        local root = character
+            and character:FindFirstChild("HumanoidRootPart")
+        local targetRoot = targetCharacter
+            and targetCharacter:FindFirstChild("HumanoidRootPart")
+        local humanoid = character
+            and character:FindFirstChildOfClass("Humanoid")
+
+        if not target or not root or not targetRoot or not humanoid then
+            HadoHub:Notify({
+                Title = "HadoHub",
+                Content = "Select a valid player first.",
+                Duration = 3
+            })
+            return
+        end
+
+        local savedCFrame = root.CFrame
+        local angular = Instance.new("BodyAngularVelocity")
+        angular.Name = "HadoFlingForce"
+        angular.AngularVelocity = Vector3.new(0, 99999, 0)
+        angular.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        angular.P = math.huge
+        angular.Parent = root
+
+        humanoid.PlatformStand = true
+
+        local finishAt = os.clock() + 1.6
+
+        while os.clock() < finishAt
+            and targetRoot.Parent
+            and root.Parent do
+
+            root.CFrame = targetRoot.CFrame
+                * CFrame.new(
+                    math.random(-2, 2),
+                    math.random(-1, 2),
+                    math.random(-2, 2)
+                )
+
+            root.AssemblyLinearVelocity =
+                Vector3.new(0, 90, 0)
+
+            RunService.Heartbeat:Wait()
+        end
+
+        angular:Destroy()
+        humanoid.PlatformStand = false
+        root.AssemblyLinearVelocity = Vector3.zero
+        root.AssemblyAngularVelocity = Vector3.zero
+        root.CFrame = savedCFrame
+
+        HadoHub:Notify({
+            Title = "HadoHub",
+            Content = "Fling finished.",
+            Duration = 2
+        })
     end
 })
 
