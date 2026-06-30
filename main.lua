@@ -14,22 +14,19 @@ local PURPLE = Color3.fromRGB(174, 61, 255)
 local LIGHT_PURPLE = Color3.fromRGB(225, 167, 255)
 
 local function LoadAsset(url, filename)
-    if not writefile or not isfile or not getcustomasset then
+    local assetFunction = getcustomasset or getsynasset
+
+    if not writefile or not assetFunction then
         return nil
     end
 
-    if not isfile(filename) then
-        local success, data = pcall(function()
-            return game:HttpGet(url, true)
-        end)
-
-        if success then
-            writefile(filename, data)
-        end
-    end
+    pcall(function()
+        local data = game:HttpGet(url .. "?asset=" .. tostring(os.time()), true)
+        writefile(filename, data)
+    end)
 
     local success, asset = pcall(function()
-        return getcustomasset(filename)
+        return assetFunction(filename)
     end)
 
     return success and asset or nil
@@ -234,10 +231,6 @@ local Window = HadoHub:CreateWindow({
 task.spawn(function()
     task.wait(1)
 
-    if not HadoIcon then
-        return
-    end
-
     local roots = { PlayerGui }
 
     pcall(function()
@@ -280,19 +273,21 @@ task.spawn(function()
                 end
 
                 if windowFrame then
-                    local icon = Instance.new("ImageLabel")
-                    icon.Name = "HadoTitleIcon"
-                    icon.Position = UDim2.fromOffset(11, 7)
-                    icon.Size = UDim2.fromOffset(30, 30)
-                    icon.BackgroundTransparency = 1
-                    icon.Image = HadoIcon
-                    icon.ScaleType = Enum.ScaleType.Crop
-                    icon.ZIndex = 100
-                    icon.Parent = windowFrame
+                    if HadoIcon then
+                        local icon = Instance.new("ImageLabel")
+                        icon.Name = "HadoTitleIcon"
+                        icon.Position = UDim2.fromOffset(11, 7)
+                        icon.Size = UDim2.fromOffset(30, 30)
+                        icon.BackgroundTransparency = 1
+                        icon.Image = HadoIcon
+                        icon.ScaleType = Enum.ScaleType.Crop
+                        icon.ZIndex = 100
+                        icon.Parent = windowFrame
 
-                    local iconCorner = Instance.new("UICorner")
-                    iconCorner.CornerRadius = UDim.new(0, 6)
-                    iconCorner.Parent = icon
+                        local iconCorner = Instance.new("UICorner")
+                        iconCorner.CornerRadius = UDim.new(0, 6)
+                        iconCorner.Parent = icon
+                    end
 
                     if HadoBackground
                         and not windowFrame:FindFirstChild("HadoWindowBackground") then
