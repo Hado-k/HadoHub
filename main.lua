@@ -302,9 +302,9 @@ task.spawn(function()
                         backgroundImage.Size = UDim2.fromScale(1, 1)
                         backgroundImage.BackgroundTransparency = 1
                         backgroundImage.Image = HadoBackground
-                        backgroundImage.ImageTransparency = 0.68
+                        backgroundImage.ImageTransparency = 0.48
                         backgroundImage.ScaleType = Enum.ScaleType.Crop
-                        backgroundImage.ZIndex = 0
+                        backgroundImage.ZIndex = 1
                         backgroundImage.Parent = windowFrame
 
                         local backgroundCorner = Instance.new("UICorner")
@@ -312,7 +312,29 @@ task.spawn(function()
                         backgroundCorner.Parent = backgroundImage
                     end
 
+                    element.Position = UDim2.new(
+                        element.Position.X.Scale,
+                        element.Position.X.Offset + 18,
+                        element.Position.Y.Scale,
+                        element.Position.Y.Offset
+                    )
+                    element.TextSize = math.max(element.TextSize, 14)
+                    element.TextColor3 = Color3.fromRGB(214, 88, 255)
+
+                    local titleGlow = element:FindFirstChild("HadoNeonGlow")
+                        or Instance.new("UIStroke")
+                    titleGlow.Name = "HadoNeonGlow"
+                    titleGlow.Color = Color3.fromRGB(194, 45, 255)
+                    titleGlow.Thickness = 0.8
+                    titleGlow.Transparency = 0.25
+                    titleGlow.Parent = element
+
                     for _, styled in ipairs(windowFrame:GetDescendants()) do
+                        if styled:IsA("GuiObject")
+                            and styled.Name ~= "HadoWindowBackground" then
+                            styled.ZIndex = math.max(styled.ZIndex, 2)
+                        end
+
                         if styled:IsA("TextLabel")
                             or styled:IsA("TextButton") then
 
@@ -325,8 +347,8 @@ task.spawn(function()
                             styled.Color = Color3.fromRGB(166, 72, 255)
                         elseif styled:IsA("Frame")
                             and styled ~= windowFrame
-                            and styled.BackgroundTransparency < 0.18 then
-                            styled.BackgroundTransparency = 0.26
+                            and styled.BackgroundTransparency < 0.45 then
+                            styled.BackgroundTransparency = 0.52
                         end
                     end
 
