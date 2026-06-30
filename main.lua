@@ -299,7 +299,7 @@ task.spawn(function()
                         backgroundImage.Image = HadoBackground
                         backgroundImage.ImageTransparency = 0.12
                         backgroundImage.ScaleType = Enum.ScaleType.Crop
-                        backgroundImage.ZIndex = 1
+                        backgroundImage.ZIndex = 0
                         backgroundImage.Parent = windowFrame
 
                         local backgroundCorner = Instance.new("UICorner")
@@ -312,7 +312,7 @@ task.spawn(function()
                     titlePadding.PaddingLeft = UDim.new(0, 44)
                     titlePadding.Parent = element
 
-                    element.TextSize = math.max(element.TextSize, 18)
+                    element.TextSize = math.max(element.TextSize, 20)
                     element.TextColor3 = Color3.fromRGB(225, 83, 255)
 
                     local titleGlow = element:FindFirstChild("HadoNeonGlow")
@@ -324,11 +324,6 @@ task.spawn(function()
                     titleGlow.Parent = element
 
                     for _, styled in ipairs(windowFrame:GetDescendants()) do
-                        if styled:IsA("GuiObject")
-                            and styled.Name ~= "HadoWindowBackground" then
-                            styled.ZIndex = styled.ZIndex + 5
-                        end
-
                         if styled:IsA("TextLabel")
                             or styled:IsA("TextButton") then
 
@@ -640,8 +635,8 @@ FlingDropdown:OnChanged(function(value)
 end)
 
 Tabs.Player:AddButton({
-    Title = "Fling selected player",
-    Description = "Fling the player selected above.",
+    Title = "Spin fling selected player",
+    Description = "Spin-fling the selected player.",
 
     Callback = function()
         local target = SelectedFlingPlayer
@@ -688,8 +683,9 @@ Tabs.Player:AddButton({
                     math.random(-2, 2)
                 )
 
-            root.AssemblyLinearVelocity =
-                Vector3.new(0, 90, 0)
+            root.AssemblyLinearVelocity = Vector3.zero
+            root.AssemblyAngularVelocity =
+                Vector3.new(0, 100000, 0)
 
             RunService.Heartbeat:Wait()
         end
