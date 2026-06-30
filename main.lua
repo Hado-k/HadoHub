@@ -230,9 +230,9 @@ local Window = HadoHub:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Add the Hado PFP at the far-left of Fluent's header
+-- Pin the Hado PFP directly to the main Fluent window.
 task.spawn(function()
-    task.wait(0.8)
+    task.wait(1)
 
     if not HadoIcon then
         return
@@ -250,7 +250,6 @@ task.spawn(function()
         end
     end)
 
-    -- Remove icons left by earlier executions.
     for _, rootGui in ipairs(roots) do
         for _, oldIcon in ipairs(rootGui:GetDescendants()) do
             if oldIcon.Name == "HadoTitleIcon" then
@@ -264,37 +263,33 @@ task.spawn(function()
             if element:IsA("TextLabel")
                 and string.find(element.Text, "HADO HUB", 1, true) then
 
-                local header = element.Parent
+                local current = element
+                local windowFrame = nil
 
-                while header and header ~= rootGui do
-                    if header:IsA("GuiObject")
-                        and header.AbsoluteSize.X >= 500
-                        and header.AbsoluteSize.Y <= 80 then
-                        break
+                while current and current ~= rootGui do
+                    if current:IsA("GuiObject")
+                        and current.AbsoluteSize.X >= 580
+                        and current.AbsoluteSize.Y >= 400 then
+                        windowFrame = current
                     end
 
-                    header = header.Parent
+                    current = current.Parent
                 end
 
-                if header and header:IsA("GuiObject") then
+                if windowFrame then
                     local icon = Instance.new("ImageLabel")
                     icon.Name = "HadoTitleIcon"
-                    icon.AnchorPoint = Vector2.new(0, 0.5)
-                    icon.Position = UDim2.new(0, 13, 0.5, 0)
-                    icon.Size = UDim2.fromOffset(24, 24)
+                    icon.Position = UDim2.fromOffset(13, 13)
+                    icon.Size = UDim2.fromOffset(22, 22)
                     icon.BackgroundTransparency = 1
                     icon.Image = HadoIcon
                     icon.ScaleType = Enum.ScaleType.Crop
-                    icon.ZIndex = 50
-                    icon.Parent = header
+                    icon.ZIndex = 100
+                    icon.Parent = windowFrame
 
                     local iconCorner = Instance.new("UICorner")
                     iconCorner.CornerRadius = UDim.new(0, 6)
                     iconCorner.Parent = icon
-
-                    if not string.match(element.Text, "^%s%s%s%s%s") then
-                        element.Text = "      " .. element.Text
-                    end
 
                     return
                 end
