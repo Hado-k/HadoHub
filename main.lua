@@ -297,7 +297,7 @@ task.spawn(function()
                         backgroundImage.Size = UDim2.fromScale(1, 1)
                         backgroundImage.BackgroundTransparency = 1
                         backgroundImage.Image = HadoBackground
-                        backgroundImage.ImageTransparency = 0.04
+                        backgroundImage.ImageTransparency = 0
                         backgroundImage.ScaleType = Enum.ScaleType.Crop
                         backgroundImage.ZIndex = 0
                         backgroundImage.Parent = windowFrame
@@ -309,10 +309,12 @@ task.spawn(function()
                     local titlePadding = element:FindFirstChild("HadoTitlePadding")
                         or Instance.new("UIPadding")
                     titlePadding.Name = "HadoTitlePadding"
-                    titlePadding.PaddingLeft = UDim.new(0, 50)
+                    titlePadding.PaddingLeft = UDim.new(0, 54)
+                    titlePadding.PaddingTop = UDim.new(0, 1)
                     titlePadding.Parent = element
 
-                    element.TextSize = math.max(element.TextSize, 21)
+                    element.TextSize = math.max(element.TextSize, 23)
+                    element.TextYAlignment = Enum.TextYAlignment.Center
                     element.Font = Enum.Font.GothamBold
                     element.TextColor3 = Color3.fromRGB(225, 83, 255)
 
@@ -347,7 +349,7 @@ task.spawn(function()
                             and styled.AbsoluteSize.X >= windowFrame.AbsoluteSize.X * 0.7
                             and styled.AbsoluteSize.Y >= windowFrame.AbsoluteSize.Y * 0.7
                             and styled.BackgroundTransparency < 0.45 then
-                            styled.BackgroundTransparency = 0.84
+                            styled.BackgroundTransparency = 0.92
                         end
                     end
 
@@ -610,6 +612,7 @@ Tabs.Player:AddSlider("FlySpeed", {
 
 local SpinFlingForce = nil
 local SpinFlingStabilizer = nil
+local SpinFlingUpright = nil
 local SpinFlingConnection = nil
 local SavedRootProperties = nil
 
@@ -627,6 +630,11 @@ local function StopSpinFling()
     if SpinFlingStabilizer then
         SpinFlingStabilizer:Destroy()
         SpinFlingStabilizer = nil
+    end
+
+    if SpinFlingUpright then
+        SpinFlingUpright:Destroy()
+        SpinFlingUpright = nil
     end
 
     local character = Player.Character
@@ -676,8 +684,20 @@ local function StartSpinFling()
     SpinFlingStabilizer.Name = "HadoSpinStabilizer"
     SpinFlingStabilizer.MaxForce =
         Vector3.new(math.huge, 0, math.huge)
-    SpinFlingStabilizer.P = 25000
+    SpinFlingStabilizer.P = 35000
     SpinFlingStabilizer.Parent = root
+
+    SpinFlingUpright = Instance.new("BodyGyro")
+    SpinFlingUpright.Name = "HadoUprightStabilizer"
+    SpinFlingUpright.MaxTorque =
+        Vector3.new(math.huge, 0, math.huge)
+    SpinFlingUpright.P = 60000
+    SpinFlingUpright.D = 1200
+    SpinFlingUpright.CFrame = CFrame.new(
+        root.Position,
+        root.Position + root.CFrame.LookVector
+    )
+    SpinFlingUpright.Parent = root
 
     SpinFlingConnection = RunService.Heartbeat:Connect(function()
         if not root.Parent or not humanoid.Parent then
@@ -688,8 +708,16 @@ local function StartSpinFling()
         local speed = math.max(humanoid.WalkSpeed, 16)
         SpinFlingStabilizer.Velocity =
             humanoid.MoveDirection * speed
+        SpinFlingUpright.CFrame = CFrame.new(
+            root.Position,
+            root.Position + Vector3.new(
+                root.CFrame.LookVector.X,
+                0,
+                root.CFrame.LookVector.Z
+            )
+        )
         root.AssemblyAngularVelocity =
-            Vector3.new(0, 8500, 0)
+            Vector3.new(0, 5000, 0)
     end)
 end
 
