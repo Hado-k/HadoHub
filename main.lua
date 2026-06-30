@@ -6,40 +6,37 @@ local UserInputService = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
-local PFP_URL =     "https://raw.githubusercontent.com/Hado-k/HadoHub/main/hadopfpNew.png"  local BACKGROUND_URL =     "https://raw.githubusercontent.com/Hado-k/HadoHub/main/image.png"  local DISCORD_URL = "https://discord.gg/g9e6VZnhft"  local function LoadAsset(url, filename)     if not writefile or not isfile or not getcustomasset then         return nil     end      if not isfile(filename) then         local success, data = pcall(function()             return game:HttpGet(url, true)         end)          if success then             writefile(filename, data)         end     end      local success, asset = pcall(function()         return getcustomasset(filename)     end)      return success and asset or nil end  local HadoIcon = LoadAsset(PFP_URL, "HadoHubIcon.png") local HadoBackground =     LoadAsset(BACKGROUND_URL, "HadoHubBackground.png") =
-    "https://raw.githubusercontent.com/Hado-k/HadoHub/main/hadopfpNew.png"
-
+local PFP_URL = "https://raw.githubusercontent.com/Hado-k/HadoHub/main/hadopfpNew.png"
+local BACKGROUND_URL = "https://raw.githubusercontent.com/Hado-k/HadoHub/main/image.png"
 local DISCORD_URL = "https://discord.gg/g9e6VZnhft"
 
 local PURPLE = Color3.fromRGB(174, 61, 255)
 local LIGHT_PURPLE = Color3.fromRGB(225, 167, 255)
 
--- Download and register the Hado icon
-local function LoadHadoIcon()
+local function LoadAsset(url, filename)
     if not writefile or not isfile or not getcustomasset then
         return nil
     end
 
-    local path = "HadoHubIcon.png"
-
-    if not isfile(path) then
-        local success, imageData = pcall(function()
-            return game:HttpGet(ICON_URL, true)
+    if not isfile(filename) then
+        local success, data = pcall(function()
+            return game:HttpGet(url, true)
         end)
 
         if success then
-            writefile(path, imageData)
+            writefile(filename, data)
         end
     end
 
     local success, asset = pcall(function()
-        return getcustomasset(path)
+        return getcustomasset(filename)
     end)
 
     return success and asset or nil
 end
 
-local HadoIcon = LoadHadoIcon()
+local HadoIcon = LoadAsset(PFP_URL, "HadoHubIcon.png")
+local HadoBackground = LoadAsset(BACKGROUND_URL, "HadoHubBackground.png")
 
 -- Remove old Hado interfaces
 for _, object in ipairs(PlayerGui:GetChildren()) do
