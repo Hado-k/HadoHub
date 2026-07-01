@@ -217,12 +217,25 @@ local HadoHub = loadstring(game:HttpGet(
     "https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"
 ))()
 
+local Camera = workspace.CurrentCamera
+local Viewport = Camera and Camera.ViewportSize
+    or Vector2.new(1280, 720)
+local IsMobile =
+    UserInputService.TouchEnabled and Viewport.X < 800
+
+local WindowWidth = IsMobile
+    and math.clamp(Viewport.X - 18, 320, 580)
+    or 650
+local WindowHeight = IsMobile
+    and math.clamp(Viewport.Y - 70, 360, 510)
+    or 510
+
 local Window = HadoHub:CreateWindow({
     Title = "HADO HUB",
     SubTitle = "by Hado-k • v1.0",
-    TabWidth = 155,
-    Size = UDim2.fromOffset(650, 510),
-    Acrylic = true,
+    TabWidth = IsMobile and 108 or 155,
+    Size = UDim2.fromOffset(WindowWidth, WindowHeight),
+    Acrylic = not IsMobile,
     Theme = "Amethyst",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
@@ -261,10 +274,10 @@ task.spawn(function()
 
                 while current and current ~= rootGui do
                     if current:IsA("GuiObject")
-                        and current.AbsoluteSize.X >= 580
-                        and current.AbsoluteSize.X <= 720
-                        and current.AbsoluteSize.Y >= 400
-                        and current.AbsoluteSize.Y <= 580 then
+                        and current.AbsoluteSize.X >= WindowWidth - 35
+                        and current.AbsoluteSize.X <= WindowWidth + 35
+                        and current.AbsoluteSize.Y >= WindowHeight - 35
+                        and current.AbsoluteSize.Y <= WindowHeight + 35 then
                         windowFrame = current
                         break
                     end
@@ -276,8 +289,8 @@ task.spawn(function()
                     if HadoIcon then
                         local icon = Instance.new("ImageLabel")
                         icon.Name = "HadoTitleIcon"
-                        icon.Position = UDim2.fromOffset(8, 4)
-                        icon.Size = UDim2.fromOffset(36, 36)
+                        icon.Position = UDim2.fromOffset(IsMobile and 6 or 8, IsMobile and 6 or 4)
+                        icon.Size = UDim2.fromOffset(IsMobile and 32 or 36, IsMobile and 32 or 36)
                         icon.BackgroundTransparency = 1
                         icon.Image = HadoIcon
                         icon.ScaleType = Enum.ScaleType.Crop
@@ -309,11 +322,14 @@ task.spawn(function()
                     local titlePadding = element:FindFirstChild("HadoTitlePadding")
                         or Instance.new("UIPadding")
                     titlePadding.Name = "HadoTitlePadding"
-                    titlePadding.PaddingLeft = UDim.new(0, 54)
+                    titlePadding.PaddingLeft = UDim.new(0, IsMobile and 42 or 45)
                     titlePadding.PaddingTop = UDim.new(0, 1)
                     titlePadding.Parent = element
 
-                    element.TextSize = math.max(element.TextSize, 23)
+                    element.TextSize = math.max(
+                        element.TextSize,
+                        IsMobile and 18 or 23
+                    )
                     element.TextYAlignment = Enum.TextYAlignment.Center
                     element.Font = Enum.Font.GothamBold
                     element.TextColor3 = Color3.fromRGB(225, 83, 255)
