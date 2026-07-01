@@ -1,3 +1,24 @@
+local PlayerToggle = Tabs.Visuals:AddToggle("PlayerESP", {
+    Title = "Player ESP",
+    Description = "Highlight all other players.",
+    Default = false
+})
+
+PlayerToggle:OnChanged(function(value)
+    PlayerESPEnabled = value
+    RefreshPlayers()
+end)
+
+local NameToggle = Tabs.Visuals:AddToggle("NameESP", {
+    Title = "Player names",
+    Description = "Show display names above players.",
+    Default = false
+})
+
+NameToggle:OnChanged(function(value)
+    NamesEnabled = value
+    RefreshPlayers()
+end)
 
 local DistanceToggle = Tabs.Visuals:AddToggle("DistanceESP", {
     Title = "Player distance",
